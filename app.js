@@ -82,13 +82,26 @@
     }
   }
 
-  function removeItem(it) {
+  function ask(message, choices) {
+    return new Promise(res => {
+      $('dlgMsg').textContent = message;
+      const box = $('dlgBtns'); box.innerHTML = '';
+      choices.forEach(([label, value, primary]) => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = primary ? 'primary' : 'ghost'; b.textContent = label;
+        b.onclick = () => { $('dlg').classList.add('hidden'); res(value); };
+        box.appendChild(b);
+      });
+      $('dlg').classList.remove('hidden');
+    });
+  }
+
+  async function removeItem(it) {
     if (it.repeat !== 'none') {
-      if (confirm('이 날짜의 항목만 삭제할까요?\n(취소를 누르면 반복 전체 삭제 여부를 묻습니다)')) {
-        (it.skip = it.skip || []).push(selected);
-      } else if (confirm('반복되는 모든 항목을 삭제할까요?')) {
-        data.items = data.items.filter(i => i.id !== it.id);
-      } else return;
+      const c = await ask('반복 항목을 어떻게 삭제할까요?', [['이 날만', 'one', true], ['반복 전체', 'all'], ['취소', null]]);
+      if (c === 'one') (it.skip = it.skip || []).push(selected);
+      else if (c === 'all') data.items = data.items.filter(i => i.id !== it.id);
+      else return;
     } else {
       data.items = data.items.filter(i => i.id !== it.id);
     }
@@ -193,7 +206,7 @@
     const text = $('eventInput').value.trim();
     if (!text) return;
     const time = $('eventStart').value, end = $('eventEnd').value;
-    if (time && end && end < time) { alert('종료 시간이 시작 시간보다 빠릅니다.'); return; }
+    if (time && end && end < time) { ask('종료 시간이 시작 시간보다 빠릅니다.', [['확인', true, true]]); return; }
     data.items.push({ id: uid(), kind: 'event', text, date: selected, time, end, repeat: $('eventRepeat').value, done: {}, skip: [] });
     $('eventInput').value = ''; $('eventStart').value = ''; $('eventEnd').value = ''; $('eventRepeat').value = 'none';
     save(); render();
