@@ -3,6 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#E8702A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
 <title>Orange Diary · 나의 캘린더</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Noto+Serif+KR:wght@400;600;700&display=swap" rel="stylesheet">
@@ -14,8 +20,9 @@
     <div class="logo">O</div>
     <div>
       <h1>Orange Diary</h1>
-      <p>나만의 캘린더 · 할 일 · 메모</p>
+      <p>나만의 캘린더 · 할 일 · 일정 · 메모</p>
     </div>
+    <button class="icon-btn theme" id="theme" aria-label="다크 모드 전환">☾</button>
   </header>
 
   <main class="layout">
@@ -35,6 +42,7 @@
       <div class="grid" id="grid"></div>
       <div class="legend">
         <span><i class="dot d-todo"></i>할 일</span>
+        <span><i class="dot d-event"></i>일정</span>
         <span><i class="dot d-memo"></i>메모</span>
       </div>
     </section>
@@ -50,16 +58,41 @@
 
       <div class="tabs">
         <button class="tab active" data-tab="todo">할 일</button>
+        <button class="tab" data-tab="event">일정</button>
         <button class="tab" data-tab="memo">메모장</button>
       </div>
 
       <div class="panel" id="panel-todo">
-        <form class="add" id="todoForm">
-          <input id="todoInput" placeholder="할 일을 입력하세요" autocomplete="off" maxlength="120">
-          <button class="primary" type="submit">추가</button>
+        <form class="form" id="todoForm">
+          <div class="row2">
+            <input id="todoInput" placeholder="할 일을 입력하세요" autocomplete="off" maxlength="120">
+          </div>
+          <div class="row2">
+            <div><label class="lbl" for="todoTime">시간 (선택)</label><input type="time" id="todoTime"></div>
+            <div><label class="lbl" for="todoRepeat">반복</label><select id="todoRepeat" aria-label="반복">
+              <option value="none">반복 없음</option><option value="daily">매일</option><option value="weekly">매주</option><option value="monthly">매월</option><option value="yearly">매년</option>
+            </select></div>
+          </div>
+          <div class="row"><button class="primary" type="submit">추가</button></div>
         </form>
         <ul class="list" id="todoList"></ul>
         <div class="empty" id="todoEmpty">이 날의 할 일이 없어요.<br>여유로운 하루를 즐기세요 ✦</div>
+      </div>
+
+      <div class="panel hidden" id="panel-event">
+        <form class="form" id="eventForm">
+          <input id="eventInput" placeholder="일정 제목" autocomplete="off" maxlength="120">
+          <div class="row2">
+            <div><label class="lbl" for="eventStart">시작</label><input type="time" id="eventStart"></div>
+            <div><label class="lbl" for="eventEnd">종료</label><input type="time" id="eventEnd"></div>
+          </div>
+          <div><label class="lbl" for="eventRepeat">반복</label><select id="eventRepeat" aria-label="반복">
+              <option value="none">반복 없음</option><option value="daily">매일</option><option value="weekly">매주</option><option value="monthly">매월</option><option value="yearly">매년</option>
+            </select></div>
+          <div class="row"><button class="primary" type="submit">일정 추가</button></div>
+        </form>
+        <ul class="list" id="eventList"></ul>
+        <div class="empty" id="eventEmpty">이 날의 일정이 없어요.<br>새로운 일정을 등록해보세요 ✦</div>
       </div>
 
       <div class="panel hidden" id="panel-memo">
@@ -77,6 +110,7 @@
     </section>
   </main>
 </div>
+<script>try{var t=localStorage.getItem("orange-theme");if(t)document.documentElement.dataset.theme=t;else if(matchMedia("(prefers-color-scheme:dark)").matches)document.documentElement.dataset.theme="dark"}catch(e){}</script>
 <script src="app.js"></script>
 </body>
 </html>
